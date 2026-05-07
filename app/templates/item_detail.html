@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Item Details - ShareTools{% endblock %}
+
+{% block content %}
+<div class="item-detail-page">
+    <a href="{{ url_for('browse') }}" class="back-link">← Back to Browse</a>
+    
+    <div class="item-detail-container">
+        <div class="item-detail-main">
+            <h1>{{ item.name }}</h1>
+            <div class="item-meta">
+                <span class="category-badge">{{ item.category }}</span>
+                <span class="status {% if item.available %}available{% else %}borrowed{% endif %}">
+                    {% if item.available %}✓ Available{% else %}🔒 Borrowed{% endif %}
+                </span>
+            </div>
+            
+            <h3>Description</h3>
+            <p class="description">{{ item.description or 'No description provided' }}</p>
+        </div>
+        
+        <div class="item-detail-sidebar">
+            <div class="owner-card">
+                <h3>Owner</h3>
+                <p><strong>{{ item.owner.full_name }}</strong></p>
+                <p>{{ item.owner.neighborhood }}</p>
+                {% if item.owner.phone %}
+                    <p>📞 {{ item.owner.phone }}</p>
+                {% endif %}
+                
+                {% if item.available %}
+                    <button class="btn btn-primary request-btn" onclick="requestItem({{ item.id }})">
+                        Request This Item
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>Currently Borrowed</button>
+                {% endif %}
+            </div>
+            
+            <div class="info-card">
+                <p><small>Listed: {{ item.created_at.strftime('%B %d, %Y') }}</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function requestItem(itemId) {
+    if (!confirm('Request this item?')) return;
+    
+    fetch(`/request-item/${itemId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Request sent! The owner will respond soon.');
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+</script>
+{% endblock %}

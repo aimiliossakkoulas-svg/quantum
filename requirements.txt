@@ -1,0 +1,7 @@
+qiskit
+qiskit-ibm-runtime
+flask
+flask-sqlalchemy
+flask-login
+werkzeug
+gunicorn

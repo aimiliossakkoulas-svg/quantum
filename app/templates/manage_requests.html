@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Requests - ShareTools{% endblock %}
+
+{% block content %}
+<div class="manage-requests-page">
+    <h1>Manage Borrowing Requests</h1>
+    
+    {% if requests %}
+        <div class="requests-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th>Request Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr class="request-row status-{{ req.status }}">
+                        <td>
+                            <strong>{{ req.item.name }}</strong>
+                            <br><small>{{ req.item.category }}</small>
+                        </td>
+                        <td>
+                            {{ req.requester.full_name }}
+                            <br><small>{{ req.requester.neighborhood }}</small>
+                            {% if req.requester.phone %}
+                                <br><small>📞 {{ req.requester.phone }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ req.status }}">{{ req.status|capitalize }}</span>
+                        </td>
+                        <td>{{ req.request_date.strftime('%b %d') }}</td>
+                        <td class="actions">
+                            {% if req.status == 'pending' %}
+                                <button class="btn btn-sm btn-success" onclick="approveRequest({{ req.id }})">Approve</button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectRequest({{ req.id }})">Reject</button>
+                            {% elif req.status == 'approved' %}
+                                <button class="btn btn-sm btn-warning" onclick="markReturned({{ req.id }})">Mark Returned</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">No requests yet. When someone requests one of your items, they'll appear here.</p>
+    {% endif %}
+</div>
+
+<script>
+function approveRequest(requestId) {
+    if (!confirm('Approve this request?')) return;
+    fetch(`/api/request/${requestId}/approve`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+
+function rejectRequest(requestId) {
+    if (!confirm('Reject this request?')) return;
+    fetch(`/api/request/${requestId}/reject`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+
+function markReturned(requestId) {
+    if (!confirm('Mark as returned?')) return;
+    fetch(`/api/request/${requestId}/return`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+</script>
+{% endblock %}
