@@ -1,10 +1,18 @@
 from flask import Flask
 from flask_login import LoginManager
 from .models import db, User
+import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_sharing.db'
+    
+    # Use Railway PostgreSQL if available, otherwise fallback to SQLite for local development
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_sharing.db'
+    
     app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
