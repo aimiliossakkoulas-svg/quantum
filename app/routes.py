@@ -203,7 +203,8 @@ def register_routes(app):
             query = query.filter_by(category=category)
         
         if search:
-            query = query.filter(Item.name.ilike(f"%{search}%"))
+            search_pattern = f"%{search}%"
+            query = query.filter(Item.name.ilike(search_pattern))
         
         items = query.all()
         return jsonify([item.to_dict() for item in items])
