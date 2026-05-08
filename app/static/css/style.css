@@ -357,11 +357,17 @@ body {
     font-weight: 500;
 }
 
+.filter-section input,
 .filter-section select {
     padding: 0.5rem 1rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+}
+
+.filter-section input {
+    width: 100%;
+    max-width: 400px;
 }
 
 /* Item Detail */

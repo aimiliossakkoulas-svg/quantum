@@ -1,18 +1,23 @@
 // Browse page JavaScript - Load and filter items
 document.addEventListener('DOMContentLoaded', function() {
     const categoryFilter = document.getElementById('category-filter');
+    const searchInput = document.getElementById('search-input');
     const itemsContainer = document.getElementById('items-container');
     
-    loadItems('all');
+    loadItems('all', '');
     
     categoryFilter.addEventListener('change', function(e) {
-        loadItems(e.target.value);
+        loadItems(e.target.value, searchInput.value);
+    });
+
+    searchInput.addEventListener('input', function(e) {
+        loadItems(categoryFilter.value, e.target.value);
     });
 });
 
-function loadItems(category) {
+function loadItems(category, search) {
     const itemsContainer = document.getElementById('items-container');
-    const url = `/api/items?category=${category}`;
+    const url = `/api/items?category=${encodeURIComponent(category)}&search=${encodeURIComponent(search)}`;
     
     fetch(url)
         .then(response => response.json())

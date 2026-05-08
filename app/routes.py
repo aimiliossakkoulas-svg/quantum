@@ -196,10 +196,14 @@ def register_routes(app):
             return jsonify({'error': 'Unauthorized'}), 401
         
         category = request.args.get('category')
+        search = request.args.get('search', '').strip()
         query = Item.query.filter(Item.owner_id != session['user_id'], Item.available == True)
         
         if category and category != 'all':
             query = query.filter_by(category=category)
+        
+        if search:
+            query = query.filter(Item.name.ilike(f"%{search}%"))
         
         items = query.all()
         return jsonify([item.to_dict() for item in items])
